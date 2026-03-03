@@ -42,7 +42,7 @@ http {
 		'$status $body_bytes_sent "$http_referer" '
 		'"$http_user_agent" "$http_x_forwarded_for"';
 
-	{% if cinny_access_log_enabled %}
+	{% if sable_access_log_enabled %}
 	access_log /var/log/nginx/access.log main;
 	{% else %}
 	access_log off;
@@ -62,7 +62,7 @@ http {
 		root /usr/share/nginx/html;
 
 		location / {
-			# Inspired by: https://raw.githubusercontent.com/cinnyapp/cinny/dev/docker-nginx.conf
+			# Inspired by: https://raw.githubusercontent.com/7w1/sable/dev/docker-nginx.conf
 
 			root /usr/share/nginx/html;
 

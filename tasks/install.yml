@@ -9,134 +9,134 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Ensure Cinny paths exist
+- name: Ensure Sable paths exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: "0750"
-    owner: "{{ cinny_uid }}"
-    group: "{{ cinny_gid }}"
+    owner: "{{ sable_uid }}"
+    group: "{{ sable_gid }}"
   with_items:
-    - "{{ cinny_base_path }}"
-    - "{{ cinny_config_path }}"
+    - "{{ sable_base_path }}"
+    - "{{ sable_config_path }}"
 
-- name: Ensure Cinny support files installed
+- name: Ensure Sable support files installed
   ansible.builtin.template:
     src: "{{ role_path }}/templates/{{ item }}.j2"
-    dest: "{{ cinny_base_path }}/{{ item }}"
+    dest: "{{ sable_base_path }}/{{ item }}"
     mode: "0640"
-    owner: "{{ cinny_uid }}"
-    group: "{{ cinny_gid }}"
+    owner: "{{ sable_uid }}"
+    group: "{{ sable_gid }}"
   with_items:
     - env
     - labels
-  register: cinny_support_files_result
+  register: sable_support_files_result
 
-- name: Ensure Cinny nginx.conf installed
+- name: Ensure Sable nginx.conf installed
   ansible.builtin.template:
     src: "{{ role_path }}/templates/{{ item }}.j2"
-    dest: "{{ cinny_config_path }}/{{ item }}"
+    dest: "{{ sable_config_path }}/{{ item }}"
     mode: "0640"
-    owner: "{{ cinny_uid }}"
-    group: "{{ cinny_gid }}"
+    owner: "{{ sable_uid }}"
+    group: "{{ sable_gid }}"
   with_items:
     - nginx.conf
-  register: cinny_nginx_config_file_result
+  register: sable_nginx_config_file_result
 
-- name: Ensure Cinny configuration installed
+- name: Ensure Sable configuration installed
   ansible.builtin.copy:
-    content: "{{ cinny_configuration | to_nice_json }}"
-    dest: "{{ cinny_config_path }}/config.json"
+    content: "{{ sable_configuration | to_nice_json }}"
+    dest: "{{ sable_config_path }}/config.json"
     mode: "0640"
-    owner: "{{ cinny_uid }}"
-    group: "{{ cinny_gid }}"
-  register: cinny_config_file_result
+    owner: "{{ sable_uid }}"
+    group: "{{ sable_gid }}"
+  register: sable_config_file_result
 
-- name: Run if self-building of Cinny container image is not enabled
-  when: "not cinny_container_image_self_build | bool"
+- name: Run if self-building of Sable container image is not enabled
+  when: "not sable_container_image_self_build | bool"
   block:
-    - name: Ensure Cinny container image is pulled via community.docker.docker_image
+    - name: Ensure Sable container image is pulled via community.docker.docker_image
       when: devture_systemd_docker_base_container_image_pull_method == 'ansible-module'
       community.docker.docker_image:
-        name: "{{ cinny_container_image }}"
+        name: "{{ sable_container_image }}"
         source: "{{ 'pull' if ansible_version.major > 2 or ansible_version.minor > 7 else omit }}"
-        force_source: "{{ cinny_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
-        force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else cinny_container_image_force_pull }}"
-      register: cinny_container_image_pull_result
+        force_source: "{{ sable_container_image_force_pull if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+        force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else sable_container_image_force_pull }}"
+      register: sable_container_image_pull_result
       retries: "{{ devture_playbook_help_container_retries_count }}"
       delay: "{{ devture_playbook_help_container_retries_delay }}"
-      until: cinny_container_image_pull_result is not failed
+      until: sable_container_image_pull_result is not failed
 
-    - name: Ensure Cinny container image is pulled via ansible.builtin.command
+    - name: Ensure Sable container image is pulled via ansible.builtin.command
       when: devture_systemd_docker_base_container_image_pull_method == 'command'
       ansible.builtin.command:
-        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ cinny_container_image }}"
-      register: cinny_container_image_pull_result
+        cmd: "{{ devture_systemd_docker_base_host_command_docker }} pull {{ sable_container_image }}"
+      register: sable_container_image_pull_result
       retries: "{{ devture_playbook_help_container_retries_count }}"
       delay: "{{ devture_playbook_help_container_retries_delay }}"
-      until: cinny_container_image_pull_result is not failed
-      changed_when: "'Downloaded newer image' in cinny_container_image_pull_result.stdout"
+      until: sable_container_image_pull_result is not failed
+      changed_when: "'Downloaded newer image' in sable_container_image_pull_result.stdout"
 
-- name: Run if self-building of Cinny container image is enabled
-  when: "cinny_container_image_self_build | bool"
+- name: Run if self-building of Sable container image is enabled
+  when: "sable_container_image_self_build | bool"
   block:
-    - name: Ensure Cinny repository is present on self-build
+    - name: Ensure Sable repository is present on self-build
       ansible.builtin.git:
-        repo: "{{ cinny_container_image_self_build_repo }}"
-        version: "{{ cinny_container_image_self_build_repo_version }}"
-        dest: "{{ cinny_container_image_self_build_src_files_path }}"
+        repo: "{{ sable_container_image_self_build_repo }}"
+        version: "{{ sable_container_image_self_build_repo_version }}"
+        dest: "{{ sable_container_image_self_build_src_files_path }}"
         force: "yes"
-      register: cinny_git_pull_results
+      register: sable_git_pull_results
 
-    - name: Ensure Cinny container image is built
+    - name: Ensure Sable container image is built
       community.docker.docker_image:
-        name: "{{ cinny_container_image_self_build_name }}"
+        name: "{{ sable_container_image_self_build_name }}"
         source: build
-        force_source: "{{ cinny_git_pull_results.changed if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
-        force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else cinny_git_pull_results.changed }}"
+        force_source: "{{ sable_git_pull_results.changed if ansible_version.major > 2 or ansible_version.minor >= 8 else omit }}"
+        force: "{{ omit if ansible_version.major > 2 or ansible_version.minor >= 8 else sable_git_pull_results.changed }}"
         build:
           dockerfile: Dockerfile
-          path: "{{ cinny_container_image_self_build_src_files_path }}"
+          path: "{{ sable_container_image_self_build_src_files_path }}"
           pull: true
           args:
-      register: cinny_container_image_build_result
+      register: sable_container_image_build_result
 
-- name: Ensure Cinny container network is created via community.docker.docker_network
+- name: Ensure Sable container network is created via community.docker.docker_network
   when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
   community.docker.docker_network:
     enable_ipv6: "{{ devture_systemd_docker_base_ipv6_enabled }}"
-    name: "{{ cinny_container_network }}"
+    name: "{{ sable_container_network }}"
     driver: bridge
     driver_options: "{{ devture_systemd_docker_base_container_networks_driver_options }}"
-  register: cinny_network_creation_result
+  register: sable_network_creation_result
 
-- name: Ensure Cinny container network is created via ansible.builtin.command
+- name: Ensure Sable container network is created via ansible.builtin.command
   when: devture_systemd_docker_base_container_network_creation_method == 'command'
   ansible.builtin.command:
     cmd: >-
       {{ devture_systemd_docker_base_host_command_docker }} network create
       {% if devture_systemd_docker_base_ipv6_enabled %}--ipv6{% endif %}
       {{ devture_systemd_docker_base_container_networks_driver_options_string }}
-      {{ cinny_container_network }}
-  register: cinny_network_creation_result
-  changed_when: cinny_network_creation_result.rc == 0
-  failed_when: cinny_network_creation_result.rc != 0 and 'already exists' not in cinny_network_creation_result.stderr
+      {{ sable_container_network }}
+  register: sable_network_creation_result
+  changed_when: sable_network_creation_result.rc == 0
+  failed_when: sable_network_creation_result.rc != 0 and 'already exists' not in sable_network_creation_result.stderr
 
-- name: Ensure Cinny systemd service is present
+- name: Ensure Sable systemd service is present
   ansible.builtin.template:
-    src: "{{ role_path }}/templates/systemd/cinny.service.j2"
-    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ cinny_identifier }}.service"
+    src: "{{ role_path }}/templates/systemd/sable.service.j2"
+    dest: "{{ devture_systemd_docker_base_systemd_path }}/{{ sable_identifier }}.service"
     mode: "0644"
-  register: cinny_systemd_service_result
+  register: sable_systemd_service_result
 
-- name: Determine whether Cinny needs a restart
+- name: Determine whether Sable needs a restart
   ansible.builtin.set_fact:
-    cinny_restart_necessary: >-
+    sable_restart_necessary: >-
       {{
-        cinny_support_files_result.changed | default(false)
-        or cinny_nginx_config_file_result.changed | default(false)
-        or cinny_config_file_result.changed | default(false)
-        or cinny_systemd_service_result.changed | default(false)
-        or cinny_container_image_pull_result.changed | default(false)
-        or cinny_container_image_build_result.changed | default(false)
+        sable_support_files_result.changed | default(false)
+        or sable_nginx_config_file_result.changed | default(false)
+        or sable_config_file_result.changed | default(false)
+        or sable_systemd_service_result.changed | default(false)
+        or sable_container_image_pull_result.changed | default(false)
+        or sable_container_image_build_result.changed | default(false)
       }}

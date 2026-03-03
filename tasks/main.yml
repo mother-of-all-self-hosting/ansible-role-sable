@@ -4,32 +4,32 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Perform Cinny installation tasks
-  when: cinny_enabled | bool
+- name: Perform Sable installation tasks
+  when: sable_enabled | bool
   tags:
     - setup-all
-    - setup-cinny
+    - setup-sable
     - install-all
-    - install-cinny
+    - install-sable
   block:
-    - name: Validate Cinny configuration
+    - name: Validate Sable configuration
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
-    - name: Install Cinny
+    - name: Install Sable
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
 
-- name: Perform Cinny self-check tasks
-  when: cinny_enabled | bool
+- name: Perform Sable self-check tasks
+  when: sable_enabled | bool
   tags:
-    - self-check-cinny
+    - self-check-sable
   block:
-    - name: Run self-check for Cinny
+    - name: Run self-check for Sable
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/self_check.yml"
 
-- name: Perform Cinny uninstallation tasks
-  when: not cinny_enabled | bool
+- name: Perform Sable uninstallation tasks
+  when: not sable_enabled | bool
   tags:
     - setup-all
-    - setup-cinny
+    - setup-sable
   block:
-    - name: Uninstall Cinny
+    - name: Uninstall Sable
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"

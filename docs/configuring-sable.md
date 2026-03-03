@@ -18,57 +18,57 @@ SPDX-FileCopyrightText: 2024-2026 Suguru Hirahara
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# Setting up Cinny
+# Setting up Sable
 
-This is an [Ansible](https://www.ansible.com/) role which installs [Cinny](https://github.com/ajbura/cinny) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
+This is an [Ansible](https://www.ansible.com/) role which installs [Sable](https://github.com/7w1/sable) (a fork of [Cinny](https://github.com/cinnyapp/cinny)) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-Cinny is a web client for [Matrix](https://matrix.org/), realtime communication (chat) network. It focuses primarily on simple, elegant and secure interface.
+Sable is a web client for [Matrix](https://matrix.org/), realtime communication (chat) network. It focuses primarily on simple, elegant and secure interface.
 
-See the project's [documentation](https://github.com/cinnyapp/cinny/blob/dev/README.md) to learn what Cinny does and why it might be useful to you.
+See the project's [documentation](https://github.com/7w1/sable) to learn what Sable does and why it might be useful to you.
 
 >[!NOTE]
-> This role merely enables you to set up the client; To communicate with other people on the Matrix network you need to prepare a Matrix homeserver which this client can connect to. While it is still possible to use a public homeserver with the Cinny instance, [this "matrix-docker-ansible-deploy" Ansible playbook](https://github.com/spantaleev/matrix-docker-ansible-deploy/) lets you set up Matrix services from the core ones such as a homeserver to other goodies like "bridges" on your server — it is pretty complete and well maintained.
+> This role merely enables you to set up the client; To communicate with other people on the Matrix network you need to prepare a Matrix homeserver which this client can connect to. While it is still possible to use a public homeserver with the Sable instance, [this "matrix-docker-ansible-deploy" Ansible playbook](https://github.com/spantaleev/matrix-docker-ansible-deploy/) lets you set up Matrix services from the core ones such as a homeserver to other goodies like "bridges" on your server — it is pretty complete and well maintained.
 
 ## Adjusting the playbook configuration
 
-To enable Cinny with this role, add the following configuration to your `vars.yml` file.
+To enable Sable with this role, add the following configuration to your `vars.yml` file.
 
 **Note**: the path should be something like `inventory/host_vars/mash.example.com/vars.yml` if you use the [MASH Ansible playbook](https://github.com/mother-of-all-self-hosting/mash-playbook).
 
 ```yaml
 ########################################################################
 #                                                                      #
-# cinny                                                                #
+# sable                                                                #
 #                                                                      #
 ########################################################################
 
-cinny_enabled: true
+sable_enabled: true
 
 ########################################################################
 #                                                                      #
-# /cinny                                                               #
+# /sable                                                               #
 #                                                                      #
 ########################################################################
 ```
 
 ### Set the hostname
 
-To enable Cinny you need to set the hostname as well. To do so, add the following configuration to your `vars.yml` file. Make sure to replace `example.com` with your own value.
+To enable Sable you need to set the hostname as well. To do so, add the following configuration to your `vars.yml` file. Make sure to replace `example.com` with your own value.
 
 ```yaml
-cinny_hostname: "example.com"
+sable_hostname: "example.com"
 ```
 
 After adjusting the hostname, make sure to adjust your DNS records to point the domain to your server.
 
-**Note**: hosting Cinny under a subpath (by configuring the `cinny_path_prefix` variable) does not seem to be possible due to Cinny's technical limitations.
+**Note**: hosting Sable under a subpath (by configuring the `sable_path_prefix` variable) does not seem to be possible due to Sable's technical limitations.
 
 ### Set the default homeserver URL
 
 It is also necessary to specify the default homeserver's URL by adding the following configuration to your `vars.yml` file:
 
 ```yaml
-cinny_default_hs_url: YOUR_HOMESERVER_URL_HERE
+sable_default_hs_url: YOUR_HOMESERVER_URL_HERE
 ```
 
 ### Extending the configuration
@@ -78,7 +78,7 @@ There are some additional things you may wish to configure about the service.
 Take a look at:
 
 - [`defaults/main.yml`](../defaults/main.yml) for some variables that you can customize via your `vars.yml` file
-- [`templates/config.json.j2`](../templates/config.json.j2) for the component's default configuration. You can override settings (even those that don't have dedicated playbook variables) using the `cinny_configuration_extension_json` variable
+- [`templates/config.json.j2`](../templates/config.json.j2) for the component's default configuration. You can override settings (even those that don't have dedicated playbook variables) using the `sable_configuration_extension_json` variable
 
 ## Installing
 
@@ -92,7 +92,7 @@ If you use the MASH playbook, the shortcut commands with the [`just` program](ht
 
 ## Usage
 
-After running the command for installation, Cinny becomes available at the specified hostname like `https://example.com`.
+After running the command for installation, Sable becomes available at the specified hostname like `https://example.com`.
 
 To get started, open the URL with a web browser, and log in to your homeserver with the Matrix account.
 
@@ -100,4 +100,4 @@ To get started, open the URL with a web browser, and log in to your homeserver w
 
 ### Check the service's logs
 
-You can find the logs in [systemd-journald](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) by logging in to the server with SSH and running `journalctl -fu cinny` (or how you/your playbook named the service, e.g. `mash-cinny`).
+You can find the logs in [systemd-journald](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) by logging in to the server with SSH and running `journalctl -fu sable` (or how you/your playbook named the service, e.g. `mash-sable`).

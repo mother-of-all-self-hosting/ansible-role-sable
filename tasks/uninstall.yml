@@ -4,46 +4,46 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-- name: Check existence of Cinny systemd service
+- name: Check existence of Sable systemd service
   ansible.builtin.stat:
-    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ cinny_identifier }}.service"
-  register: cinny_service_stat
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ sable_identifier }}.service"
+  register: sable_service_stat
 
-- name: Uninstall Cinny systemd services and files
-  when: cinny_service_stat.stat.exists | bool
+- name: Uninstall Sable systemd services and files
+  when: sable_service_stat.stat.exists | bool
   block:
-    - name: Ensure Cinny systemd service is stopped
+    - name: Ensure Sable systemd service is stopped
       ansible.builtin.service:
-        name: "{{ cinny_identifier }}"
+        name: "{{ sable_identifier }}"
         state: stopped
         enabled: false
         daemon_reload: true
 
-    - name: Ensure Cinny systemd service does not exist
+    - name: Ensure Sable systemd service does not exist
       ansible.builtin.file:
-        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ cinny_identifier }}.service"
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ sable_identifier }}.service"
         state: absent
 
-    - name: Ensure Cinny container network does not exist
-      when: cinny_container_network_deletion_enabled
+    - name: Ensure Sable container network does not exist
+      when: sable_container_network_deletion_enabled
       block:
-        - name: Ensure Cinny container network does not exist via community.docker.docker_network
+        - name: Ensure Sable container network does not exist via community.docker.docker_network
           when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
           community.docker.docker_network:
-            name: "{{ cinny_container_network }}"
+            name: "{{ sable_container_network }}"
             state: absent
-          register: cinny_network_deletion_result
+          register: sable_network_deletion_result
 
-        - name: Ensure Cinny container network does not exist via ansible.builtin.command
+        - name: Ensure Sable container network does not exist via ansible.builtin.command
           when: devture_systemd_docker_base_container_network_creation_method == 'command'
           ansible.builtin.command:
             cmd: >-
               {{ devture_systemd_docker_base_host_command_docker }} network rm
-              {{ cinny_container_network }}
-          register: cinny_network_deletion_result
-          changed_when: cinny_container_network in cinny_network_deletion_result.stdout
+              {{ sable_container_network }}
+          register: sable_network_deletion_result
+          changed_when: sable_container_network in sable_network_deletion_result.stdout
 
-    - name: Ensure Cinny path does not exist
+    - name: Ensure Sable path does not exist
       ansible.builtin.file:
-        path: "{{ cinny_base_path }}"
+        path: "{{ sable_base_path }}"
         state: absent

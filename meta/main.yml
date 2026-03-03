@@ -2,9 +2,9 @@
 galaxy_info:
   author: Suguru Hirahara
   company: progressiv
-  role_name: cinny
+  role_name: sable
   namespace: progressiv
-  description: Cinny
+  description: Sable
   platforms:
     - name: Debian
       versions:
