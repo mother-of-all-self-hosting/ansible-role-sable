@@ -64,7 +64,7 @@ sable_container_network_deletion_enabled: true
 sable_container_http_host_bind_port: ""
 
 # The port number in the container
-sable_container_http_port: 80
+sable_container_http_port: 8080
 
 # A list of additional container networks that the container would be connected to.
 # The role does not create these networks, so make sure they already exist.
@@ -241,6 +241,9 @@ sable_container_cleanup_command: |
 # Default homeserver URL to use in the `config.json` file.
 # See `sable_config_homeserverList`.
 sable_default_hs_url: ""
+
+# Controls whether the Sable access log is enabled
+sable_access_log_enabled: true
 
 # Controls the `defaultHomeserver` value in the `config.json` file.
 sable_config_defaultHomeserver: 0  # noqa var-naming
