@@ -12,7 +12,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 ---
-# Project source code URL: https://github.com/7w1/sable
+# Project source code URL: https://github.com/sableclient/sable
 
 sable_enabled: true
 
@@ -20,8 +20,8 @@ sable_identifier: sable
 sable_base_path: "/{{ sable_identifier }}"
 sable_config_path: "{{ sable_base_path }}/config"
 
-# renovate: datasource=docker depName=ghcr.io/7w1/sable
-sable_version: 1.6.0
+# renovate: datasource=docker depName=ghcr.io/sableclient/sable
+sable_version: 1.13.1
 
 sable_uid: ""
 sable_gid: ""
@@ -47,8 +47,8 @@ sable_container_image_registry_prefix_upstream_default: ghcr.io/
 sable_container_image_force_pull: "{{ sable_container_image.endswith(':latest') }}"
 
 sable_container_image_self_build: false
-sable_container_image_self_build_name: "7w1/sable:{{ sable_container_image_self_build_repo_version }}"
-sable_container_image_self_build_repo: "https://github.com/SableClient/Sable.git"
+sable_container_image_self_build_name: "sableclient/sable:{{ sable_container_image_self_build_repo_version }}"
+sable_container_image_self_build_repo: "https://github.com/sableclient/sable.git"
 sable_container_image_self_build_repo_version: "{{ sable_version if sable_version != 'latest' else 'main' }}"
 sable_container_image_self_build_src_files_path: "{{ sable_base_path }}/docker-src"
 
