@@ -27,6 +27,10 @@ provisioner:
   inventory:
     group_vars:
       all:
+        # Helper variables
+        sable_debug_service_enabled: false
+
+        # Variables for Sable
         sable_uid: 1000
         sable_gid: 1000
         sable_hostname: sable
