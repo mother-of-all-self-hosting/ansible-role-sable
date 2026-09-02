@@ -118,7 +118,7 @@
   ansible.builtin.assert:
     that:
       - sable_index.status == 200
-      - "'<title>Sable</title>' in sable_index.content"
+      - "'<title>Sable Client</title>' in sable_index.content"
     fail_msg: "The Sable page was not served ({{ sable_index.status }})"
     success_msg: "The Sable page is served ({{ sable_index.content | length }} bytes)"
 
@@ -140,7 +140,7 @@
   ansible.builtin.assert:
     that:
       - sable_spa_route.status == 200
-      - "'<title>Sable</title>' in sable_spa_route.content"
+      - "'<title>Sable Client</title>' in sable_spa_route.content"
     fail_msg: "A Sable route was not rewritten to the application ({{ sable_spa_route.status }})"
     success_msg: "Sable routes unknown paths to the application"
 
@@ -256,7 +256,7 @@
         with open(sys.argv[1], encoding='utf-8', errors='replace') as handle:
             bundle = handle.read()
 
-        print(' '.join(sorted(set(re.findall(r'children:"(v[0-9][^"]*)"', bundle)))))
+        print(' '.join(sorted(set(re.findall(r'children: `Sable v([0-9][^"]*) \\u', bundle)))))
       - "{{ sable_molecule_bundle_path }}"
   register: sable_bundle_version
   changed_when: false
