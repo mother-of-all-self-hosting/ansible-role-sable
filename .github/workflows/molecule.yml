@@ -166,6 +166,8 @@ jobs:
       # the job, so that it cannot block automerge - which is why
       # continue-on-error sits on the step and not on the job (a failing job
       # would still produce a failed check run).
+      #
+      # TODO: Send a fix to the upstream project to make the note above invalid altogether
       - name: Run Molecule
         id: molecule
         continue-on-error: true
