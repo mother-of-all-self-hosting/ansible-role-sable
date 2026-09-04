@@ -273,7 +273,7 @@
     path: "{{ sable_molecule_bundle_path }}"
     state: absent
 
-- name: Show Sable verification summary
+- name: Show the Sable verification summary
   ansible.builtin.debug:
     msg:
       - "Sable systemd: {{ sable_service.status.ActiveState }}"
