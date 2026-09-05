@@ -263,11 +263,6 @@
     fail_msg: "Sable reports {{ sable_bundle_version.stdout | default('none') }}, expected {{ sable_defaults.sable_version }}"
     success_msg: "Sable reports {{ sable_bundle_version.stdout }}"
 
-- name: Remove the downloaded Sable application bundle
-  ansible.builtin.file:
-    path: "{{ sable_molecule_bundle_path }}"
-    state: absent
-
 - name: Show the Sable verification summary
   ansible.builtin.debug:
     msg:
