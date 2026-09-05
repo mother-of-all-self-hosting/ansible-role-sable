@@ -254,6 +254,7 @@
   register: sable_bundle_version
   changed_when: false
 
+# This time the version is checked inside the application that is actually running
 - name: Assert the running Sable is the version this role installs
   ansible.builtin.assert:
     that:
