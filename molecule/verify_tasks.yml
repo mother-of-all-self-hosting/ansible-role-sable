@@ -47,10 +47,7 @@
 
 - name: Inspect the running Sable container
   ansible.builtin.command:
-    argv:
-      - docker
-      - inspect
-      - sable
+    cmd: docker inspect sable
   register: sable_container_raw
   changed_when: false
 
