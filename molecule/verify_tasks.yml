@@ -15,13 +15,14 @@
     file: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}/defaults/main.yml"
     name: sable_defaults
 
-- name: Wait for the Sable systemd service to become active (up to 180s)
+- name: Wait for the Sable systemd services to become active (up to 180s each)
   ansible.builtin.systemd_service:
-    name: sable.service
-  register: sable_service
-  until: sable_service.status.ActiveState == 'active'
+    name: "{{ item }}"
+  register: sable_services
+  until: sable_services.status.ActiveState == 'active'
   retries: 36
   delay: 5
+  loop: "{{ sable_verify_units }}"
   # So that giving up is reported by the assertion below rather than as a
   # wall of systemd unit properties.
   failed_when: false
@@ -29,17 +30,20 @@
 # `Restart=always` in the systemd unit means that even a container which crashes
 # and gets restarted reads as active here, so this is a precondition rather than
 # a result.
-- name: Assert the Sable systemd service is active
+- name: Assert the Sable systemd services are active
   ansible.builtin.assert:
-    that: sable_service.status.ActiveState == 'active'
-    fail_msg: "sable.service is not active ({{ sable_service.status.ActiveState }})"
-    success_msg: "sable.service is active"
+    that: sable_services.results | map(attribute='status.ActiveState') | unique | list == ['active']
+    fail_msg: >-
+      Not every service is active:
+      {{ dict(sable_verify_units | zip(sable_services.results | map(attribute='status.ActiveState'))) }}
+    success_msg: "Every systemd service is active"
 
-- name: Retrieve the Sable systemd service log for debugging
+- name: Retrieve the Sable systemd services log for debugging
   when: sable_debug_service_enabled | bool
   ansible.builtin.command:
-    cmd: journalctl --no-pager --output=cat --unit=sable.service
+    cmd: "journalctl --no-pager --output=cat --unit={{ item }}"
   changed_when: false
+  loop: "{{ sable_verify_units }}"
 
 # ------------------------------------------------------------------
 # The container the role actually started
@@ -269,7 +273,7 @@
 - name: Show the Sable verification summary
   ansible.builtin.debug:
     msg:
-      - "Sable systemd: {{ sable_service.status.ActiveState }}"
+      - "Sable systemd: {% for unit, state in sable_verify_units | zip(sable_services.results | map(attribute='status.ActiveState')) %}{{ unit }} ({{ state }}){% if not loop.last %}, {% endif %}{% endfor %}"
       - "Sable container user: {{ sable_container.Config.User }}"
       - "Sable running version: {{ sable_bundle_version.stdout }}"
       - "Sable page size: {{ sable_index.content | length }} bytes"

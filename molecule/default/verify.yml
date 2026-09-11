@@ -14,6 +14,9 @@
     sable_molecule_base_url: "http://127.0.0.1:{{ sable_molecule_http_bind_port }}"
     sable_molecule_bundle_path: /tmp/sable-molecule-bundle.js
 
+    sable_verify_units:
+      - sable.service
+
   tasks:
     - name: Verify that Sable works
       block:
