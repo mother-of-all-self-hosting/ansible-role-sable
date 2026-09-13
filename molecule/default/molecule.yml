@@ -30,6 +30,7 @@ provisioner:
       all:
         # Helper variables
         sable_debug_service_enabled: false
+        sable_restarts_check_enabled: true
 
         # The port on the host that Sable is published on. In a real
         # deployment, Sable sits behind a reverse-proxy and is not published
