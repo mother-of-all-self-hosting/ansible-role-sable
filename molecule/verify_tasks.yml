@@ -222,29 +222,37 @@
 # changes with every release, so the only way to reach it is to read it
 # off the page that references it. Unlike the image label, this holds for
 # a self-built image too, because the value comes from the sources.
-- name: Determine the Sable application bundle that the page loads
+- name: Determine the Sable page module that the page loads
   ansible.builtin.set_fact:
     # `regex_search` with a capture group hands back a list of groups, or
     # nothing at all when the page does not match. Joining covers both.
-    sable_bundle_url: "{{ (sable_index.content | regex_search('src=\"(/assets/index-[^\"]+\\.js)\"', '\\1') | default([], true)) | join('') }}"
+    sable_bundle_url: "{{ (sable_index.content | regex_search('href=\"(/assets/page-[^\"]+\\.js)\"', '\\1') | default([], true)) | join('') }}"
 
-- name: Assert the Sable page references an application bundle
+    # sable_bundle_url: "{{ (sable_index.content | regex_search('src=\"(/assets/index-[^\"]+\\.js)\"', '\\1') | default([], true)) | join('') }}"
+
+- name: Assert the Sable page references an page module
   ansible.builtin.assert:
     that: sable_bundle_url | length > 0
-    fail_msg: "The served page references no application bundle: {{ sable_index.content }}"
-    success_msg: "The served page loads its application bundle from {{ sable_bundle_url }}"
+    fail_msg: "The served page references no page module: {{ sable_index.content }}"
+    success_msg: "The served page loads its page module from {{ sable_bundle_url }}"
 
-- name: Download the Sable application bundle
+- name: Download the Sable page module
   ansible.builtin.get_url:
     url: "{{ sable_molecule_base_url }}{{ sable_bundle_url }}"
     dest: "{{ sable_molecule_bundle_path }}"
     mode: "0640"
   register: sable_bundle_download
 
+- name: Display the Sable page module
+  when: sable_debug_service_enabled | bool
+  ansible.builtin.command:
+    cmd: "cat {{ sable_molecule_bundle_path }}"
+  changed_when: false
+
 # The bundle is several megabytes, so it is searched on the host rather
 # than pulled into a variable. Sable renders its version as the text of a
 # link to its releases page, which is what this pattern picks up.
-- name: Read the version out of the Sable application bundle
+- name: Read the version out of the Sable page module
   ansible.builtin.command:
     argv:
       - python3
@@ -256,7 +264,12 @@
         with open(sys.argv[1], encoding='utf-8', errors='replace') as handle:
             bundle = handle.read()
 
-        print(' '.join(sorted(set(re.findall(r'children: `Sable v([0-9][^"]*) \\u', bundle)))))
+        matches = re.findall(
+            r"build:`v([0-9]+\.[0-9]+\.[0-9]+)",
+            bundle,
+        )
+
+        print(" ".join(sorted(set(matches))))
       - "{{ sable_molecule_bundle_path }}"
   register: sable_bundle_version
   changed_when: false
