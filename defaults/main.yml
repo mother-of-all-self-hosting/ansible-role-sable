@@ -147,6 +147,12 @@ sable_container_extra_arguments: "{{ sable_container_extra_arguments_auto + sabl
 sable_container_extra_arguments_auto: []
 sable_container_extra_arguments_custom: []
 
+# A list of extra arguments to pass to the process inside the container
+# Example: ['--SOME_ARGUMENT']
+sable_process_extra_arguments: "{{ sable_process_extra_arguments_auto + sable_process_extra_arguments_custom }}"
+sable_process_extra_arguments_auto: []
+sable_process_extra_arguments_custom: []
+
 # Specifies the value of the `X-XSS-Protection` header
 # Stops pages from loading when they detect reflected cross-site scripting (XSS) attacks.
 #
