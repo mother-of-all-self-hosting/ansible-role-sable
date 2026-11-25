@@ -157,6 +157,29 @@
     fail_msg: "The Sable manifest was not served ({{ sable_manifest.status }})"
     success_msg: "The Sable manifest is served"
 
+# Sable has no such file, so without the role's one this path falls back to
+# `index.html`, which browsers do not accept as a service worker.
+- name: Request the service worker which replaces the one of Sable Legacy
+  ansible.builtin.uri:
+    url: "{{ sable_molecule_base_url }}/sw.js"
+    method: GET
+    follow_redirects: none
+    status_code: "{{ sable_molecule_http_status_codes }}"
+    return_content: true
+  register: sable_legacy_service_worker
+  changed_when: false
+
+- name: Assert the service worker which replaces the one of Sable Legacy is served
+  ansible.builtin.assert:
+    that:
+      - sable_legacy_service_worker.status == 200
+      - "'javascript' in sable_legacy_service_worker.content_type"
+      - "'self.registration.unregister()' in sable_legacy_service_worker.content"
+    fail_msg: >-
+      The service worker which replaces the one of Sable Legacy was not served
+      ({{ sable_legacy_service_worker.status }}, {{ sable_legacy_service_worker.content_type | default('no content type') }})
+    success_msg: "The service worker which replaces the one of Sable Legacy is served"
+
 # ------------------------------------------------------------------
 # The configuration this role rendered, as the browser receives it
 # ------------------------------------------------------------------
