@@ -167,7 +167,10 @@ sable_http_header_content_type_options: nosniff
 
 # Specifies the value of the `Content-Security-Policy` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
-sable_http_header_content_security_policy: frame-ancestors 'self'
+#
+# Sable sends a strict policy of its own, generated for each build (it contains hashes of inline scripts).
+# A value specified here replaces that policy, so leave this empty unless you need to do so.
+sable_http_header_content_security_policy: ""
 
 # Specifies the value of the `Permissions-Policy` header.
 # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
