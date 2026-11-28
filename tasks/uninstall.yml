@@ -25,7 +25,7 @@
         state: absent
 
     - name: Ensure Sable container network does not exist
-      when: sable_container_network_deletion_enabled
+      when: sable_container_network_deletion_enabled and sable_container_network != 'host'
       block:
         - name: Ensure Sable container network does not exist via community.docker.docker_network
           when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
