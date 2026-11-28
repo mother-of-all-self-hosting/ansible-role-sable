@@ -68,12 +68,26 @@
 - name: Run if self-building of Sable container image is enabled
   when: "sable_container_image_self_build | bool"
   block:
+    # A checkout owned by a different user (a uid change, an earlier clone by another user, etc.) would make the git task below fail on ownership or permissions.
+    - name: Ensure Sable repository ownership is correct on self-build
+      ansible.builtin.file:
+        path: "{{ sable_container_image_self_build_src_files_path }}"
+        state: directory
+        owner: "{{ sable_uid }}"
+        group: "{{ sable_gid }}"
+        recurse: true
+
     - name: Ensure Sable repository is present on self-build
       ansible.builtin.git:
         repo: "{{ sable_container_image_self_build_repo }}"
         version: "{{ sable_container_image_self_build_repo_version }}"
         dest: "{{ sable_container_image_self_build_src_files_path }}"
         force: "yes"
+      # Keep this even though the task above normalizes ownership. Git may still see an ownership mismatch when Ansible becomes an unprivileged user.
+      environment:
+        GIT_CONFIG_COUNT: "1"
+        GIT_CONFIG_KEY_0: safe.directory
+        GIT_CONFIG_VALUE_0: "{{ sable_container_image_self_build_src_files_path }}"
       register: sable_git_pull_results
 
     - name: Ensure Sable container image is built
