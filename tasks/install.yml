@@ -76,6 +76,7 @@
         owner: "{{ sable_uid }}"
         group: "{{ sable_gid }}"
         recurse: true
+      tags: molecule-idempotence-notest
 
     - name: Ensure Sable repository is present on self-build
       ansible.builtin.git:
